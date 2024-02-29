@@ -4,6 +4,11 @@ services:
   managedhost-app-1:
     build: 
       context: managed-host/alpine/app1
+    volumes:
+      - ./secrets/id_rsa.pub:/root/.ssh/authorized_keys
+    ports:
+      - "3000:3000"
+      - "2223:2223"
     restart: unless-stopped
     network_mode: "bridge"
     environment:
@@ -11,6 +16,11 @@ services:
   managedhost-app-2:
     build: 
       context: managed-host/alpine/app2
+    volumes:
+      - ./secrets/id_rsa.pub:/root/.ssh/authorized_keys
+    ports:
+      - "3001:3000"
+      - "2224:2224"
     restart: unless-stopped
     network_mode: "bridge"
     environment:
@@ -18,6 +28,11 @@ services:
   managedhost-app-3:
     build: 
       context: managed-host/alpine/app3
+    volumes:
+      - ./secrets/id_rsa.pub:/root/.ssh/authorized_keys
+    ports:
+      - "3002:3000"
+      - "2225:2225"
     restart: unless-stopped
     network_mode: "bridge"
     environment:
