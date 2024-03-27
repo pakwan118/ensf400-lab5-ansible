@@ -1,6 +1,8 @@
+---
 # First Play
 - name: Play - Handle Files in all hosts
   hosts: all
+  become: yes
   tasks:
   - name: all host are identified with a file
     copy:
@@ -11,6 +13,7 @@
 # Second play
 - name: Play - for Alpines Nodejs app
   hosts: app_group
+  become: yes
   tasks:
   - name: NodeJs is installed
     apk:
@@ -39,7 +42,7 @@
       production: true
   - name: Install forever (to run Node.js app).
     npm: name=forever global=yes state=present
-  
+
   - name: Check list of Node.js apps running.
     command: forever list
     register: forever_list
@@ -49,3 +52,30 @@
     command: forever start /node-app/app.js
     when: "forever_list.stdout.find('/node-app/app.js') == -1"
 
+# Installing Nginx
+- name:  Play - install nginx loadbalancer
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Update cache
+      apt: update_cache=yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy the Nginx config file to /etc/nginx/sites-available
+      copy:
+        src: ./nginx.conf
+        dest: /etc/nginx/sites-available/nginx.conf
+      become: yes
+    - name: Create symlink of the config file at /etc/nginx/sites-enabled
+      file:
+        src: /etc/nginx/sites-available/nginx.conf
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
